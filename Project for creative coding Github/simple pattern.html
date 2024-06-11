@@ -1,0 +1,95 @@
+//random shapes and colors
+let shapes = ['ellipse', 'triangle', 'rect'];
+let colors = ['red', 'blue', 'black', 'purple', 'white'];
+
+
+function setup() {
+  createCanvas(600, 600);
+  background(220);
+  //center of canvas
+  translate(width/2, height/2);
+  
+  //background
+  let bgcolor = round(random(240, 360));
+  let shade = 0;
+  for(let i = 0; i <= 400; i += 50) {
+    colorMode(HSB);
+    noStroke();
+    fill(bgcolor, 20 + shade, 100);
+    rect(-(width/2),-(height/2) + i,width,i+50);
+    shade += 10;
+  }
+  
+  //for ellipse
+  let size = round(random(12, 80));
+  let start = round(random(0, 20));
+  let shape = random(shapes);
+  let color = random(colors);
+  //shape
+  let xoff = width/3;
+  let yoff = height/3;
+  let weight = round(random(1,3));
+  let col = 0;
+  translate(-200, -200);
+  for(let j = 0; j < 5; j ++) {
+    yoff = j * 100;
+    push();
+    //y offset
+    translate(0, yoff);
+      for(let i = 0; i < 5; i ++) {
+        //every other one is colored
+        if(j%2==0){
+          if(i%2==0){
+            col = color;
+          }
+        }
+        else{
+          if(i%2!=0){
+            col = color;
+          }
+        }
+          xoff = i * 100;
+        push();
+        //x offset
+        translate(xoff, 0);
+          //make the repeating pattern shape
+          makeBase(size, start, shape, weight, col);
+        pop();
+        col = 0;
+      }
+    pop();
+  }
+}
+
+//function to make shape
+function makeBase(size, start, shape, weight, col) {
+    //go around in a circle
+    for(let i = 0; i< TWO_PI; i += TWO_PI/12) {
+      colorMode(RGB);
+      //random weight
+      strokeWeight(weight);
+      noFill();
+      //color vs no color
+      if (col == 0){
+         stroke(255, 255, 255);
+      }
+      else{
+        stroke(col);
+      }
+      
+      //what shape to repeat 
+      if(shape == 'ellipse')
+        ellipse(start * 2, 0, size * 2);
+      else if(shape == 'triangle')
+        triangle(0 , 0 , size, -(50),
+                 (50) /sqrt(3), -(50) + size);
+      else
+        rect(0, start, size);
+      rotate(radians(30));
+    }
+  
+}
+
+function draw() {
+
+}

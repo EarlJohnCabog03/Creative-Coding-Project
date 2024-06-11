@@ -1,0 +1,171 @@
+//Global Variables for the background Stars
+let stars_x = [];
+let stars_y = [];
+let stars_cnt = 50;
+
+//Global Variables for data (csv file).
+let exoplanets = []; //Array to store all ExoPlanet objects
+let data_count = 1;  //Initializing data_count, how many data lines to read
+let planet_dist;     //The distance between a planet and user's mouse coordinates
+
+//Different Planet Images
+let planet1_img;
+let planet2_img;
+let planet3_img;
+let planet4_img;
+let planet5_img;
+let planet_designs = [];  //Array to store all planet images
+
+function preload() {
+  exoplanet_data = loadStrings("exoplanets.csv");
+
+  planet1_img = loadImage("Planet1.png");
+  append(planet_designs, planet1_img);
+  
+  planet2_img = loadImage("Planet2.png");
+  append(planet_designs, planet2_img);
+  
+  planet3_img = loadImage("Planet3.png");
+  append(planet_designs, planet3_img);
+  
+  planet4_img = loadImage("Planet4.png");   
+  append(planet_designs, planet4_img);
+  
+  planet5_img = loadImage("Planet5.png");
+  append(planet_designs, planet5_img);
+}
+
+function setup() {
+  createCanvas(1200, 800);
+  imageMode(CENTER);
+  
+  //If the file fails to open, then it will print the error and continuously loop.
+  if(exoplanet_data == null) {
+    print("Failed to open exoplanets.csv");
+    while(true) {}
+  }
+  
+  //Else it will print out that it was successful and how many lines were loaded. 
+  print("File successfully loaded:",exoplanet_data.length,"lines scanned.");
+    
+  //This is to populate the background stars with certain X and Y coordinates.
+  for(let i=0; i<stars_cnt; i++) {
+    append(stars_x, random(width));
+    append(stars_y, random(height));
+  } 
+}
+
+function draw() {
+  background(0);
+  
+  //This draws the stars in the background.
+  fill("white");
+  for(let i=0; i<stars_cnt; i++) {
+    ellipse(stars_x[i], stars_y[i], 5, 5);
+  }
+
+  textAlign(CENTER);
+  textSize(20);
+  text("Click for an Exo-Planet", width/2, height/2);
+  
+  //Here we continuously draw the planets on the canvas
+  for(let j=0; j<exoplanets.length; j++) {
+    exoplanets[j].draw();
+    planet_dist = dist(exoplanets[j].x, exoplanets[j].y, mouseX, mouseY);
+    
+    //If the mouse coordinates hit's the planet, it will print the data of that planet.
+    if(planet_dist < exoplanets[j].planet_radius) {
+      exoplanets[j].displayData();
+    }
+  }
+}
+
+//If the mouse is clicked, it will add a new ExoPlanet object into the exoplanets array.
+function mouseClicked() {
+  append(exoplanets, new ExoPlanet());
+}
+
+
+class ExoPlanet {
+  constructor() {
+    this.x;                  //X coordinate for the planet                    
+    this.y;                  //Y coordinate for the planet 
+    this.planet_radius;      //Radius of the planet image
+    this.design_num;         //Type of planet design from planet_designs
+    this.data;               //String data of the planet
+    this.data_split;         //Splits the data into an array of its data
+    
+    this.init();
+    this.printData();
+  }
+  
+  //This function initializes all the variables for each exoplanet.
+  init() {
+    this.design_num = int(random(5));
+    this.planet_radius = planet_designs[this.design_num].width/10;
+    
+    this.x = mouseX;
+    this.y = mouseY;
+    
+    this.data = exoplanet_data[data_count];
+    this.data_split = split(this.data, ',');
+    if(data_count != exoplanet_data.length) {
+      data_count++;
+    }
+    else {
+      print("All planets printed!");
+    }
+  }
+  
+  //This function takes a random planet image and draws it at a random (x,y) coordinate on the canvas
+  draw() {
+    image(planet_designs[this.design_num], this.x, this.y, planet_designs[this.design_num].width/5, planet_designs[this.design_num].height/5);   
+  }
+  
+  displayData() {
+    fill(255, 255, 180);
+    rect(mouseX, mouseY, 500, 120);
+    
+    textAlign(LEFT);
+    fill("black");
+    
+    text("Planet Name:", mouseX+10, mouseY+30);
+    text("Distance from Earth (ly):", mouseX+10, mouseY+55);
+    text("Stellar Magnitude (brightness):", mouseX+10, mouseY+80);
+    text("Planet Type:", mouseX+10, mouseY+105);
+    
+    fill("red");
+    text(this.data_split[0], mouseX+140, mouseY+30);
+    text(this.data_split[1], mouseX+235, mouseY+55);
+    text(this.data_split[2], mouseX+290, mouseY+80);
+    text(this.data_split[3], mouseX+125, mouseY+105);
+  }
+  
+  //This function is for debugging and code checking to ensure everything runs smoothly.
+  printData() {    
+    print("Planet Image:",this.design_num);
+    print("Planet Radius:",this.planet_radius);
+    print("Planet Data:",this.data);
+    
+    if(this.data_split[0] == "") {
+      this.data_split[0] = "undefined";
+    }
+    
+    if(this.data_split[1] == "") {
+      this.data_split[1] = "undefined";
+    }
+    
+    if(this.data_split[2] == "") {
+      this.data_split[2] = "undefined";
+    }
+    
+    if(this.data_split[3] == "") {
+      this.data_split[3] = "undefined";
+    }
+    
+    print("Planet Name:",this.data_split[0]);
+    print("Distance (from Earth):",this.data_split[1]);
+    print("Stellar Magnitude:",this.data_split[2]);
+    print("Planet Type:",this.data_split[4]);
+  }
+}

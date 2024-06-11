@@ -1,0 +1,46 @@
+let trail = [];
+let on = false;
+
+function setup() {
+  createCanvas(800, 800);
+  noStroke();
+}
+
+function draw() {
+  background(0);
+  for(let i = 0; i < trail.length; i++){
+    trail[i].display();
+  }
+  if(on == true){
+    append(trail,new Trace());
+  }
+}
+
+class Trace{
+  constructor() {
+    this.x = mouseX;
+    this.y = mouseY;
+    let R = random(-10,10);
+    let G = random(-10,10);
+    let B = random(-10,10);
+    let pc = color(random(255),random(255),random(255));
+    if(trail.length > 0){
+      pc = trail[trail.length - 1].c;
+      pc = color(red(pc)+R,green(pc)+G,blue(pc)+B);
+    }
+    this.c = pc;
+  }
+  display(){
+    fill(this.c);
+    ellipse(this.x,this.y,120);
+  }
+}
+
+
+function mousePressed() {
+  if( on == true){
+    on = false;
+  }else{
+    on = true;
+  }
+}

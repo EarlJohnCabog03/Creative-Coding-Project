@@ -1,0 +1,96 @@
+let r;
+let factor = 0;
+let totalSlider;
+let speedSlider;
+let lineColorPicker;
+let bgColorPicker;
+let textColorPicker;
+let font1;
+let word = 'Bathspa University';
+let fontSizeSlider; // Slider for font size
+let artSizeSlider; // Slider for art size
+var song
+
+function preload() {
+  font1 = loadFont('PlayfairDisplay-VariableFont_wght.ttf');
+  song = loadSound('Yokogao.mp3')
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  r = min(width, height) / 2;
+
+  // Create sliders and color pickers
+  totalSlider = createSlider(5, 500, 100, 5);
+  totalSlider.position(20, 20);
+
+  speedSlider = createSlider(0.01, 0.1, 0.05, 0.01);
+  speedSlider.position(20, 50);
+
+  lineColorPicker = createColorPicker('#ffffff');
+  lineColorPicker.position(520, 20);
+
+  bgColorPicker = createColorPicker('#000000');
+  bgColorPicker.position(520, 50);
+
+  textColorPicker = createColorPicker('#6A6D6C');
+  textColorPicker.position(520, 80);
+
+  // Create font size slider
+  fontSizeSlider = createSlider(20, 200, 30, 5);
+  fontSizeSlider.position(20, 80);
+
+  // Create art size slider
+  artSizeSlider = createSlider(200, 800, 400, 10);
+  artSizeSlider.position(20, 110);
+}
+
+function getVector(index, total) {
+  const angle = map(index % total, 0, total, 0, TWO_PI);
+  const v = p5.Vector.fromAngle(angle + PI);
+  v.mult(r);
+  return v;
+}
+
+function draw() {
+  const total = totalSlider.value();
+  const speed = speedSlider.value();
+  const lineColor = lineColorPicker.color();
+  const bgColor = bgColorPicker.color();
+  const textColor = textColorPicker.color();
+  const fontSize = fontSizeSlider.value(); // Get font size from slider
+  const artSize = artSizeSlider.value(); // Get art size from slider
+
+  r = artSize / 2;
+
+  background(bgColor);
+  factor += speed;
+
+  translate(width / 2, height / 2);
+  stroke(lineColor);
+  strokeWeight(1);
+  noFill();
+  ellipse(0, 0, r * 2);
+
+  for (let i = 0; i < total; i++) {
+    const a = getVector(i, total);
+    const b = getVector(i * factor, total);
+    line(a.x, a.y, b.x, b.y);
+  }
+
+  fill(textColor);
+  textSize(fontSize); // Set font size
+  textFont(font1);
+  textAlign(CENTER, CENTER);
+  text(word, 0, 0);
+}
+
+function mouse() {
+  if (song.isPlaying()) {
+    song.pause()
+    noLoop()
+  } else {
+    song.play()
+    loop()
+  }
+}

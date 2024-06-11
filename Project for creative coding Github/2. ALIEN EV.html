@@ -1,0 +1,771 @@
+let music;
+let plop;
+let crack;
+let buy;
+let yay;
+
+let alienFrames = [];
+let alienFrames2 = [];
+let alienFrames3 = [];
+let alienFrames4 = [];
+let alienFrames5 = [];
+
+let animationImages = [];
+let animationImages2 = [];
+let animationImages3 = [];
+let animationImages4 = [];
+let animationImages5 = [];
+
+let animationIndex = 0;
+let animationIndex2 = 0;
+let animationIndex3 = 0;
+let animationIndex4 = 0;
+let animationIndex5 = 0;
+
+let shipTime = 0;
+let items = [];
+let items2 = [];
+let mutation = 0;
+let numFrames = 2;
+let aliens = [];
+let ships = [];
+let dna;
+let dnaValue = 10;
+let rock;
+let rockTest = 0;
+let flip = 1;
+
+////////////////////////////// Up These Values If You Just Want To Test Game Features
+
+let dnaNum = 0;
+let pebNum = 0;
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+let click = 1;
+let clickPrice = 100;
+let drillNum = 1;
+let drill = 0;
+let drillPrice = 100;
+let upPrice = 250;
+let shipPrice = 2000;
+let ship = 1;
+let numAliens = 1;
+let clonePrice = 100;
+let newclonePrice;
+let mutPrice = 250;
+const INTRO = 4;
+const RUNGAME = 0;
+const DNASHOP = 1;
+const ROCKSHOP = 2;
+const ENDGAME = 3;
+let gameState = INTRO;
+let baseFont = "Arial";
+let shopFont;
+
+//------------------------------------------
+function preload() {
+  animationImages[0] = loadImage("base alien-1.png");
+  animationImages[1] = loadImage("base alien-2.png");
+  ////////////////////////////////////////////////////////
+  animationImages2[0] = loadImage("muscle alien-1.png");
+  animationImages2[1] = loadImage("muscle alien-2.png");
+  ///////////////////////////////////////////////////////
+  animationImages3[0] = loadImage("alien3-1.png");
+  animationImages3[1] = loadImage("alien3-2.png");
+  ///////////////////////////////////////////////////////
+  animationImages4[0] = loadImage("alien4-1.png");
+  animationImages4[1] = loadImage("alien4-2.png");
+  ///////////////////////////////////////////////////////
+  animationImages5[0] = loadImage("alien5-1.png");
+  animationImages5[1] = loadImage("alien5-2.png");
+  ///////////////////////////////////////////////////////
+  bg = loadImage("background-1.png");
+  bg2 = loadImage("Drill1.png");
+  bg3 = loadImage("Drill2.png");
+  bg4 = loadImage("Drill3.png");
+  DNAbg = loadImage("DNAbg.png");
+  PEBbg = loadImage("PEBbg.png");
+  Endbg = loadImage("Endbg.png");
+  ship1 = loadImage("Ship1.png");
+  ship2 = loadImage("Ship2.png");
+  ship3 = loadImage("Ship3.png");
+  ship4 = loadImage("Ship4.png");
+  shop = loadImage("shop.png");
+  blast = loadImage("blast.png");
+  rockPic = loadImage("rock.png");
+  DNAPic = loadImage("DNA.png");
+  shopFont = loadFont("nasa.ttf");
+  EndShip = loadImage("FinalShip.png");
+  Introbg = loadImage("Introbg.png");
+  
+  
+  music = new Tone.Player("music.wav").toDestination();
+  plop = new Tone.Player("Pop.wav").toDestination();
+  crack = new Tone.Player("rock.wav").toDestination();
+  buy = new Tone.Player("buy.wav").toDestination();
+  yay = new Tone.Player("yay.wav").toDestination();
+}
+//------------------------------------------------------------
+
+//-----------------------------------------
+function setup() {
+  // tone.js doesn't really work with preload()
+  Tone.loaded().then(() => {
+	// note: volume is in dB (decibels)
+    music.loop = true;
+    music.volume.value = -12;
+    music.start();
+    crack.volume.value = -6;
+    plop.volume.value = -3;  
+  });
+
+  createCanvas(800, 600);
+  textFont(shopFont);
+  textSize(50);
+  textAlign(CENTER);
+
+  for (let i = 0; i < numAliens; i++) {
+    aliens[i] = new Aliens();
+  }
+  for (let i = 0; i < 1; i++) {
+    ships[i] = new ENDSHIP();
+  }
+
+  dna = new DNAlogo();
+  rock = new Rocklogo();
+}
+//-----------------------------------------
+function draw() {
+  //music.loop();
+  if (gameState == RUNGAME) runGame();
+  if (gameState == DNASHOP) DNAshop();
+  if (gameState == ROCKSHOP) Rockshop();
+  if (gameState == ENDGAME) Endgame();
+  if (gameState == INTRO) Intro();
+}
+//----------------------------------------------
+function Intro() {
+  background(Introbg);
+  textSize(50);
+  text("ALIEN EVOLUTION", width / 2, 50);
+
+  textSize(30);
+  text("-Collect DNA", width / 2, 150);
+  text("-Click Rocks", width / 2, 200);
+  text("-Mutate and Clone", width / 2, 250);
+  text("-Build your Ship", width / 2, 300);
+  text("(EVOLVE)", width / 2, 550);
+}
+
+//--------------------------------------------
+function runGame() {
+  imageMode(CORNER);
+
+  if (drill == 0) {
+    background(bg);
+  }
+  if (drill == 1) {
+    background(bg2);
+    if (frameCount % 30 == 0) {
+      pebNum = pebNum + drillNum;
+    }
+  }
+  if (drill == 2) {
+    background(bg3);
+    if (frameCount % 20 == 0) {
+      pebNum = pebNum + drillNum * 2;
+    }
+  }
+  if (drill == 3) {
+    background(bg4);
+    if (frameCount % 10 == 0) {
+      pebNum = pebNum + drillNum * 3;
+    }
+  }
+  if (ship == 2) {
+    image(ship1, 0, 0);
+  }
+  if (ship == 3) {
+    image(ship2, 0, 0);
+  }
+  if (ship == 4) {
+    image(ship3, 0, 0);
+  }
+  if (ship == 5) {
+    image(ship4, 0, 0);
+  }
+
+  let item2 = new Item2();
+  if (
+    mouseX < 180 + 75 &&
+    mouseX > 180 - 75 &&
+    mouseY < 160 + 75 &&
+    mouseY > 160 - 75
+  ) {
+    item2.move();
+    item2.draw();
+  }
+  if (
+    mouseX < 360 + 25 &&
+    mouseX > 360 - 25 &&
+    mouseY < 312 + 25 &&
+    mouseY > 312 - 25
+  ) {
+    item2.move();
+    item2.draw();
+  }
+  if (
+    mouseX < 584 + 25 &&
+    mouseX > 584 - 25 &&
+    mouseY < 424 + 25 &&
+    mouseY > 424 - 25
+  ) {
+    item2.move();
+    item2.draw();
+  }
+  if (
+    mouseX < 702 + 45 &&
+    mouseX > 702 - 45 &&
+    mouseY < 160 + 45 &&
+    mouseY > 160 - 45
+  ) {
+    item2.move();
+    item2.draw();
+  }
+
+  if (ship == 5) {
+    if (
+      mouseX < 678 + 25 &&
+      mouseX > 678 - 25 &&
+      mouseY < 319 + 25 &&
+      mouseY > 319 - 25
+    ) {
+      image(blast, mouseX - 50, mouseY - 50);
+    }
+  }
+
+  image(shop, 0, 450);
+
+  let alien = new Aliens();
+  noFill();
+
+  alien.animate();
+  for (alien of aliens) {
+    alien.move();
+    alien.draw();
+
+    if (frameCount % 300 == 0) alien.drop();
+    for (let i = items.length; i >= 0; i--) {
+      if (items[i]) {
+        items[i].draw();
+
+        let hitboxX = items[i].x - 10;
+        let hitboxY = items[i].y + 75;
+
+        if (mutation == 1) {
+          dnaValue = 20;
+        }
+        if (mutation == 2) {
+          dnaValue = 40;
+        }
+        if (mutation == 3) {
+          dnaValue = 80;
+        }
+        if (mutation == 4) {
+          dnaValue = 100;
+        }
+
+        if (
+          mouseX < hitboxX + 30 &&
+          mouseX > hitboxX - 30 &&
+          mouseY < hitboxY + 30 &&
+          mouseY > hitboxY - 30
+        ) {
+          plop.start();
+          dnaNum = dnaNum + dnaValue;
+          items[i].isActive = false;
+        }
+
+        if (!items[i].isActive) {
+          items.splice(i, 1);
+        }
+      }
+    }
+  }
+
+  dna.draw();
+  rock.draw();
+  fill("black");
+  textSize(30);
+  textFont(shopFont);
+  textAlign(LEFT);
+  text("DNA: " + dnaNum, 270, 540);
+  text("PEB: " + pebNum, 270, 565);
+}
+//-----------------------------------------
+function DNAshop() {
+  textAlign(LEFT);
+  background(DNAbg);
+  fill("White");
+  textSize(30);
+  text("DNA: " + dnaNum, 10, 25);
+  textAlign(CENTER);
+  textSize(50);
+  text("DNA SHOP ", width / 2, 50);
+  textAlign(RIGHT);
+  textSize(30);
+
+  if (numAliens < 15) {
+    text("Clone - " + clonePrice + " DNA : ( O )", width / 2 + 150, 150);
+  } else {
+    text("Clone - ( MAX )", width / 2 + 100, 150);
+  }
+
+  if (mutation < 4) {
+    text("Mutation - " + mutPrice + " DNA : ( O )", width / 2 + 170, 200);
+  } else {
+    text("Mutation - ( MAX )", width / 2 + 120, 200);
+  }
+
+  textSize(50);
+  textAlign(CENTER);
+  text("EXIT", width / 2, 570);
+}
+//--------------------------------------------
+function Rockshop() {
+  textAlign(LEFT);
+  background(PEBbg);
+  fill("Black");
+  textSize(30);
+  text("PEB: " + pebNum, 10, 25);
+  textAlign(CENTER);
+  textSize(50);
+  text("PEBBLE SHOP ", width / 2, 50);
+  textAlign(RIGHT);
+  textSize(30);
+
+  if (drill < 3) {
+    text("Drill - " + drillPrice + " PEB : ( O )", width / 2 + 150, 150);
+  } else {
+    text("Drill - ( MAX )", width / 2 + 75, 150);
+  }
+
+  text("Upgrade - " + upPrice + " PEB : ( O )", width / 2 + 170, 200);
+  text("Click Speed - " + clickPrice + " PEB : ( O )", width / 2 + 170, 250);
+
+  if (ship < 5) {
+    text("Ship Parts - " + shipPrice + " PEB : ( O )", width / 2 + 185, 300);
+  } else {
+    text("Ship Parts - ( MAX )", width / 2 + 130, 300);
+  }
+
+  if (ship < 5) {
+    if (
+      mouseX < 556 + 10 &&
+      mouseX > 556 - 10 &&
+      mouseY < 290 + 10 &&
+      mouseY > 290 - 10
+    ) {
+      if (ship > mutation) {
+        text("MUST BE HIGHER MUTATION", width / 2 + 170, 350);
+      }
+    }
+  }
+
+  textSize(50);
+  textAlign(CENTER);
+  text("EXIT", width / 2, 570);
+}
+//------------------------------------------------------------------------------
+function Endgame() {
+  imageMode(CORNER);
+  background(Endbg);
+  imageMode(CENTER);
+
+  let endship = new ENDSHIP();
+
+  for (endship of ships) {
+    if (endship.y > -100) {
+      endship.move();
+      endship.draw();
+      shipTime = shipTime + 1;
+    }
+  }
+  if (endship.y < -99) {
+    textSize(50);
+    textAlign(CENTER);
+    fill("white");
+    text("THANK YOU FOR PLAYING", width / 2, height / 2);
+
+    music.pause();
+  }
+  if (endship.y == -99) {
+    yay.start();
+  }
+}
+//--------------------------------------------
+function mousePressed() {
+  if (gameState == RUNGAME) {
+    if (ship == 5) {
+      if (
+        mouseX < 678 + 25 &&
+        mouseX > 678 - 25 &&
+        mouseY < 319 + 25 &&
+        mouseY > 319 - 25
+      ) {
+        gameState = ENDGAME;
+      }
+    }
+
+    if (
+      mouseX < 712 + 45 &&
+      mouseX > 712 - 45 &&
+      mouseY < 534 + 45 &&
+      mouseY > 534 - 45
+    ) {
+      gameState = DNASHOP;
+    }
+    if (
+      mouseX < 550 + 45 &&
+      mouseX > 550 - 45 &&
+      mouseY < 534 + 45 &&
+      mouseY > 534 - 45
+    ) {
+      gameState = ROCKSHOP;
+    }
+    if (
+      mouseX < 180 + 75 &&
+      mouseX > 180 - 75 &&
+      mouseY < 160 + 75 &&
+      mouseY > 160 - 75
+    ) {
+      crack.start();
+      pebNum = pebNum + click;
+    }
+    if (
+      mouseX < 360 + 25 &&
+      mouseX > 360 - 25 &&
+      mouseY < 312 + 25 &&
+      mouseY > 312 - 25
+    ) {
+      crack.start();
+      pebNum = pebNum + click;
+    }
+    if (
+      mouseX < 584 + 25 &&
+      mouseX > 584 - 25 &&
+      mouseY < 424 + 25 &&
+      mouseY > 424 - 25
+    ) {
+      crack.start();
+      pebNum = pebNum + click;
+    }
+    if (
+      mouseX < 702 + 45 &&
+      mouseX > 702 - 45 &&
+      mouseY < 160 + 45 &&
+      mouseY > 160 - 45
+    ) {
+      crack.start();
+      pebNum = pebNum + click;
+    }
+  }
+
+  if (gameState == DNASHOP) {
+    if (
+      mouseX < width / 2 + 50 &&
+      mouseX > width / 2 - 50 &&
+      mouseY < 570 + 10 &&
+      mouseY > 570 - 50
+    ) {
+      gameState = RUNGAME;
+    }
+
+    if (numAliens < 15) {
+      if (
+        mouseX < 519 + 10 &&
+        mouseX > 519 - 10 &&
+        mouseY < 137 + 10 &&
+        mouseY > 137 - 10
+      ) {
+        if (dnaNum >= clonePrice) {
+          buy.start();
+          numAliens = numAliens + 1;
+          dnaNum = dnaNum - clonePrice;
+          clonePrice = clonePrice + 100 * numAliens;
+
+          aliens.push(new Aliens());
+        }
+      }
+    }
+
+    if (mutation < 4) {
+      if (
+        mouseX < 537 + 10 &&
+        mouseX > 537 - 10 &&
+        mouseY < 189 + 10 &&
+        mouseY > 189 - 10
+      ) {
+        if (dnaNum >= mutPrice) {
+          buy.start();
+          mutation = mutation + 1;
+          dnaNum = dnaNum - mutPrice;
+          mutPrice = mutPrice + 500;
+        }
+      }
+    }
+  }
+  if (gameState == ROCKSHOP) {
+    if (
+      mouseX < width / 2 + 50 &&
+      mouseX > width / 2 - 50 &&
+      mouseY < 570 + 10 &&
+      mouseY > 570 - 50
+    ) {
+      gameState = RUNGAME;
+    }
+
+    if (drill < 3) {
+      if (
+        mouseX < 519 + 10 &&
+        mouseX > 519 - 10 &&
+        mouseY < 137 + 10 &&
+        mouseY > 137 - 10
+      ) {
+        if (pebNum >= drillPrice) {
+          buy.start();
+          pebNum = pebNum - drillPrice;
+          drillPrice = drillPrice * 5;
+          drill = drill + 1;
+        }
+      }
+    }
+
+    if (
+      mouseX < 537 + 10 &&
+      mouseX > 537 - 10 &&
+      mouseY < 189 + 10 &&
+      mouseY > 189 - 10
+    ) {
+      if (pebNum >= upPrice) {
+        buy.start();
+        drillNum = drillNum + 1;
+        pebNum = pebNum - upPrice;
+        upPrice = upPrice + 1000;
+      }
+    }
+    if (
+      mouseX < 540 + 10 &&
+      mouseX > 540 - 10 &&
+      mouseY < 239 + 10 &&
+      mouseY > 239 - 10
+    ) {
+      if (pebNum >= clickPrice) {
+        buy.start();
+        pebNum = pebNum - clickPrice;
+        clickPrice = clickPrice + 200;
+        click = click + 1;
+      }
+    }
+
+    if (ship < 5) {
+      if (
+        mouseX < 556 + 10 &&
+        mouseX > 556 - 10 &&
+        mouseY < 290 + 10 &&
+        mouseY > 290 - 10
+      ) {
+        if (pebNum >= shipPrice) {
+          if (ship <= mutation) {
+            buy.start();
+            ship = ship + 1;
+            pebNum = pebNum - shipPrice;
+            shipPrice = shipPrice * 5;
+          }
+        }
+      }
+    }
+  }
+
+  if (gameState == INTRO) {
+    if (
+      mouseX < width / 2 + 60 &&
+      mouseX > width / 2 - 60 &&
+      mouseY < 550 + 30 &&
+      mouseY > 550 - 30
+    ) {
+      gameState = RUNGAME;
+    }
+  }
+}
+//--------------------------------------------
+class Aliens {
+  constructor() {
+    this.x = random(100, 700);
+    this.y = random(100, 300);
+    this.speedX = random(-1, 1);
+    this.speedY = random(-1, 1);
+
+    this.animationImages = alienFrames;
+    this.animationImages2 = alienFrames2;
+    this.animationIndex = 0;
+    this.animationIndex2 = 0;
+    this.flip = 1;
+    this.radius = 75;
+  }
+  move() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    if (this.x - 30 < 0 || this.x + 30 > width) this.speedX *= -1;
+    if (this.y - 45 < 0 || this.y > 400) this.speedY *= -1;
+
+    if (this.speedX > 0) flip = 1;
+    if (this.speedX < 0) flip = -1;
+  }
+  draw() {
+    push();
+    imageMode(CENTER);
+
+    translate(this.x, this.y);
+    scale(flip, 1);
+
+    if (mutation == 0) {
+      image(animationImages[animationIndex], 0, 0);
+    }
+    if (mutation == 1) {
+      image(animationImages2[animationIndex2], 0, 0);
+    }
+    if (mutation == 2) {
+      image(animationImages3[animationIndex3], 0, 0);
+    }
+    if (mutation == 3) {
+      image(animationImages4[animationIndex4], 0, 0);
+    }
+    if (mutation == 4) {
+      image(animationImages5[animationIndex5], 0, 0);
+    }
+    pop();
+  }
+  animate() {
+    if (mutation == 0) {
+      if (frameCount % 20 == 0) animationIndex++;
+      {
+        if (animationIndex == animationImages.length) animationIndex = 0;
+      }
+    }
+
+    if (mutation == 1) {
+      if (frameCount % 20 == 0) animationIndex2++;
+      {
+        if (animationIndex2 == animationImages2.length) animationIndex2 = 0;
+      }
+    }
+    if (mutation == 2) {
+      if (frameCount % 20 == 0) animationIndex3++;
+      {
+        if (animationIndex3 == animationImages3.length) animationIndex3 = 0;
+      }
+    }
+    if (mutation == 3) {
+      if (frameCount % 20 == 0) animationIndex4++;
+      {
+        if (animationIndex4 == animationImages4.length) animationIndex4 = 0;
+      }
+    }
+    if (mutation == 4) {
+      if (frameCount % 20 == 0) animationIndex5++;
+      {
+        if (animationIndex5 == animationImages5.length) animationIndex5 = 0;
+      }
+    }
+  }
+
+  drop() {
+    items.push(new Item(this.x, this.y));
+  }
+}
+class DNAlogo {
+  constructor() {
+    this.x = 0;
+    this.y = 450;
+  }
+  draw() {
+    push();
+    image(DNAPic, 320, 453);
+    pop();
+  }
+}
+class Rocklogo {
+  constructor() {
+    this.x = 0;
+    this.y = 450;
+  }
+  draw() {
+    push();
+    image(rockPic, 505, 463);
+    pop();
+  }
+}
+class ENDSHIP {
+  constructor() {
+    this.x = width / 2;
+    this.y = 600;
+    this.speedY = 1;
+  }
+  move() {
+    if (frameCount % 1 == 0) {
+      this.y = this.y -= this.speedY;
+    }
+  }
+  draw() {
+    push();
+    image(EndShip, this.x, this.y);
+    pop();
+  }
+}
+
+class Item {
+  constructor(x_, y_) {
+    this.x = x_;
+    this.y = y_;
+    this.isActive = true;
+    this.lifetime = 1000;
+  }
+
+  draw() {
+    image(DNAPic, this.x - width / 2, this.y);
+  }
+
+  update() {
+    this.lifetime--;
+    if (this.lifetime < 0) {
+      this.isActive = false;
+    }
+  }
+}
+class Item2 {
+  constructor() {
+    this.x = mouseX - 38;
+    this.y = mouseY - 70;
+    this.speedY = 1;
+    this.isActive = true;
+    this.lifetime = 100;
+  }
+  draw() {
+    image(rockPic, this.x, this.y);
+  }
+  move() {
+    this.y += this.speedY;
+  }
+
+  update() {
+    this.lifetime--;
+    if (this.lifetime < 0) {
+      this.isActive = false;
+    }
+  }
+}
+function isInCircle(cx, cy, cr, x, y) {
+  return dist(cx, cy, x, y) <= cr / 2;
+}
